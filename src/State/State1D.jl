@@ -66,11 +66,11 @@ function iter_state(state::State1DWolfram, n_steps::Int64)
     return State1DWolfram(next_state_grid, state.rule)
 end
 
-function iter_states(state::State1DWolfram, n_steps::Int64)::Matrix{Bool}
+function iter_states(state::State1DWolfram, n_steps::Integer)::Matrix{Bool}
     state_map = wr2map(state.rule)
-    history = []
     next_state_grid = deepcopy(state.grid)
-    for step in 1:n_steps
+    history = [next_state_grid]
+    for _ in 1:n_steps
         # println(next_state_grid)
         state_windows = window_padded(next_state_grid, 3, 1)
         next_state_grid, first_expanded, last_expanded = expand_vector_report(
