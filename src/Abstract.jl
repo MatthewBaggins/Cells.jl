@@ -1,14 +1,12 @@
 module Abstract
 
 # Rule
-export AbstractRule2D
+export AbstractRule
 
 abstract type AbstractRule end
 
-abstract type AbstractRule2D <: AbstractRule end
-
 # State
-export AbstractState1D, AbstractState2D
+export AbstractState, AbstractState1D, AbstractState2D
 
 abstract type AbstractState end
 

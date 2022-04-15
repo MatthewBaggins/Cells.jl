@@ -4,9 +4,9 @@ using ProgressBars
 
 function main()
     for rule::UInt8 in ProgressBar(0:255)
-        s = State1DWolfram(rule)
+        s = StateECA(rule)
         history = iter_states(s, 128)
-        save("wolfram_rule_$rule.png", history)
+        save("results/ECA/Rule $rule.png", history)
     end
 end
 

@@ -10,9 +10,9 @@ export  ←, displayln, min_and_max, +, shift_range, window, window_padded, mosa
 
 include("State/State.jl")
 using .State
-export State1DWolfram, State2DSquare, Life
+export StateECA, StateSquare, Life
 export wr2map, vec2wr, iter_state, iter_states, o_display, expand_state
-export Pattern2D, AllPatterns2D, insert_pattern, insert_patterns
+export PatternsSquare, PatternsSqareMap, insert_pattern, insert_patterns
 
 
 end 

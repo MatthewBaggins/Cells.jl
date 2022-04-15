@@ -1,15 +1,20 @@
-module Patterns2D
+module PatternsSquares
 
 using ..Utils
-using ..State2D: pad_matrix, State2DSquare, o_inds
+using ..StateSquares: pad_matrix, StateSquare, o_inds
 
 #= Patterns for 2D automata =#
-
 export PatternSquare, PatternsSquareMap
 
 struct PatternSquare
-    grid::Array{Bool, 2}
+    grid::BitArray
     name::String
+
+    # No-name constructor
+    PatternSquare(grid::BitArray) = new(grid, "unnamed")
+    PatternSquare(grid::Array{N} where {N <: Number}, name::String) = new(
+        map(x -> x==0 ? false : true, grid), name
+    )
 end
 
 #= Rotating functions =#
@@ -48,18 +53,17 @@ PatternsSquareMap = Dict(
     )
 
 #= Pattern insertion tools =#
-
 export insert_pattern, insert_patterns
 
-function insert_pattern(state::State2DSquare, pattern::PatternSquare, insert_pos::Tuple{Int64, Int64})
+function insert_pattern(state::StateSquare, pattern::PatternSquare, insert_pos::Tuple{Int64, Int64})
     target_size, new_origin = determine_target_size(state.grid, pattern.grid, insert_pos, state.origin)
     state_grid = pad_matrix(state.grid, target_size, new_origin)
     pattern_grid = pad_matrix(pattern.grid, target_size, insert_pos + new_origin)
     new_state_grid = map(x -> x!=0 ? 1 : 0, pattern_grid + state_grid)
-    return State2DSquare(new_state_grid, state.rule, new_origin)
+    return StateSquare(new_state_grid, state.rule, new_origin)
 end
 
-function insert_patterns(state::State2DSquare, patterns::Vector{Tuple{PatternSquare, Tuple{Int64, Int64}}})
+function insert_patterns(state::StateSquare, patterns::Vector{Tuple{PatternSquare, Tuple{Int64, Int64}}})
     x_min = min(0, [p_pos[1]-1 for (p, p_pos) in patterns]...)
     x_max = max([p_pos[1]+size(p.grid)[1] for (p, p_pos) in patterns]...)
     y_min = min(0, [p_pos[2]-1 for (p, p_pos) in patterns]...)
@@ -79,10 +83,10 @@ function insert_patterns(state::State2DSquare, patterns::Vector{Tuple{PatternSqu
         new_state_grid[p_x_inds, p_y_inds] .+= p.grid
     end
 
-    return State2DSquare(new_state_grid, state.rule, (o_x, o_y))
+    return StateSquare(new_state_grid, state.rule, (o_x, o_y))
 end
 
-# insert_pattern(s) helper function - returns (target_size, new_origin) tuple
+# `insert_pattern(s)` helper function - returns (target_size, new_origin) tuple
 function determine_target_size(m0::Matrix, m1::Matrix, m1pos::Tuple{Int64, Int64}, m0o::Tuple{Int64, Int64}=(1,1))::Tuple{Tuple{Int64, Int64}, Tuple{Int64, Int64}}
     m0x0, m0x1 = (m0o[1], size(m0)[1])
     m0y0, m0y1 = (m0o[2], size(m0)[2])
