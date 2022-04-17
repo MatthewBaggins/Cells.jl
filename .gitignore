@@ -26,3 +26,6 @@ Manifest.toml
 # Results
 results/StateECA/
 results/StateGrid/
+
+# VSCode
+.vscode
