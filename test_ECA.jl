@@ -1,3 +1,10 @@
+if !(pwd()*"/src" in LOAD_PATH) 
+    push!(LOAD_PATH, pwd()*"/src")
+    println("Pushed") 
+else 
+    println("Ready") 
+end
+
 using Cells
 using Images
 using ProgressBars

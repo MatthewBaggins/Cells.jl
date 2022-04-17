@@ -1,11 +1,12 @@
-module PatternsSquares
+module PatternSquares
+
 
 using ..Utils
-using ..StateSquares: pad_matrix, StateSquare, o_inds
+import ..StateSquares: StateSquare, o_inds
+import ..Expand: pad_matrix
 
 #= Patterns for 2D automata =#
-export PatternSquare, PatternsSquareMap
-
+export PatternSquare
 struct PatternSquare
     grid::BitArray
     name::String
@@ -24,6 +25,7 @@ rotr90(p::PatternSquare) = PatternSquare(rotr90(p.grid), p.name)
 rot180(p::PatternSquare) = PatternSquare(rot180(p.grid), p.name)
 
 # Still
+export Block, BeeHive, Loaf, Boat, Tub
 Block = PatternSquare([1 1 ; 1 1], "Block")
 BeeHive = PatternSquare([0 1 1 0 ; 1 0 0 1 ; 0 1 1 0], "BeeHive")
 Loaf = PatternSquare([0 1 1 0 ; 1 0 0 1 ; 0 1 0 1 ; 0 0 1 0], "Loaf")
@@ -31,6 +33,7 @@ Boat = PatternSquare([1 1 0 ; 1 0 1 ; 0 1 0], "Boat")
 Tub = PatternSquare([0 1 0 ; 1 0 1 ; 0 1 0], "Tub")
 
 # Oscillators
+export Blinker, Toad, Beacon, Pulsar, PentaDecathlon
 Blinker = PatternSquare([1 1 1], "Blinker")
 Toad = PatternSquare([0 1 1 1 ; 1 1 1 0], "Toad")
 Beacon = PatternSquare([1 1 0 0 ; 1 1 0 0 ; 0 0 1 1 ; 0 0 1 1], "Beacon")
@@ -40,12 +43,14 @@ Pulsar = PatternSquare(
 PentaDecathlon = PatternSquare(mosaic2([1 1 1 ; 1 0 1 ; 1 1 1 ; 1 1 1], 0, 1), "PentaDecathlon")
 
 # Spaceships
+export Glider, LWSS, MWSS, HWSS
 Glider = PatternSquare([0 1 0 ; 0 0 1 ; 1 1 1], "Glider")
 LWSS = PatternSquare([1 0 0 1 0 ; 0 0 0 0 1 ; 1 0 0 0 1 ; 0 1 1 1 1], "LWSS")
 MWSS = PatternSquare([0 1 1 1 1 1 ; 1 0 0 0 0 1 ; 0 0 0 0 0 1 ; 1 0 0 0 1 0 ; 0 0 1 0 0 0], "MWSS")
 HWSS = PatternSquare([0 1 1 1 1 1 1 ; 1 0 0 0 0 0 1 ; 0 0 0 0 0 0 1 ; 1 0 0 0 0 1 0 ; 0 0 1 1 0 0 0], "HWSS")
 
 # All patterns
+export PatternsSquareMap
 PatternsSquareMap = Dict(
     :Still => [Block, BeeHive, Loaf, Boat, Tub],
     :Oscillators => [Blinker, Toad, Beacon, Pulsar, PentaDecathlon],
@@ -54,9 +59,8 @@ PatternsSquareMap = Dict(
 
 #= Pattern insertion tools =#
 export insert_pattern, insert_patterns
-
 function insert_pattern(state::StateSquare, pattern::PatternSquare, insert_pos::Tuple{Int64, Int64})
-    target_size, new_origin = determine_target_size(state.grid, pattern.grid, insert_pos, state.origin)
+    target_size, new_origin = _determine_target_size(state.grid, pattern.grid, insert_pos, state.origin)
     state_grid = pad_matrix(state.grid, target_size, new_origin)
     pattern_grid = pad_matrix(pattern.grid, target_size, insert_pos + new_origin)
     new_state_grid = map(x -> x!=0 ? 1 : 0, pattern_grid + state_grid)
@@ -87,7 +91,7 @@ function insert_patterns(state::StateSquare, patterns::Vector{Tuple{PatternSquar
 end
 
 # `insert_pattern(s)` helper function - returns (target_size, new_origin) tuple
-function determine_target_size(m0::Matrix, m1::Matrix, m1pos::Tuple{Int64, Int64}, m0o::Tuple{Int64, Int64}=(1,1))::Tuple{Tuple{Int64, Int64}, Tuple{Int64, Int64}}
+function _determine_target_size(m0::Matrix, m1::Matrix, m1pos::Tuple{Int64, Int64}, m0o::Tuple{Int64, Int64}=(1,1))::Tuple{Tuple{Int64, Int64}, Tuple{Int64, Int64}}
     m0x0, m0x1 = (m0o[1], size(m0)[1])
     m0y0, m0y1 = (m0o[2], size(m0)[2])
     

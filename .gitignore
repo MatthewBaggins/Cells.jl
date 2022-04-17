@@ -24,5 +24,5 @@ docs/site/
 Manifest.toml
 
 # Results
-results/ECA/
-results/SquareGrid
+results/StateECA/
+results/StateGrid/
